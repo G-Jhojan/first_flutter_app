@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = const GeneratorPage();
         break;
       case 1:
-        page = const Placeholder();
+        page =  const FavoritesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -105,7 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Expanded(
                 child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Colors.black45,
                   child: page
                 ),
               ),
@@ -113,6 +113,36 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         );
       }
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  const FavoritesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    if (appState.favorites.isEmpty) {
+      return const Center(
+        child: Text('No favorites yet.'),
+      );
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have '
+              '${appState.favorites.length} favorites:'),
+        ),
+        for (var pair in appState.favorites)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
+          ),
+      ],
     );
   }
 }
@@ -194,3 +224,6 @@ class BigCard extends StatelessWidget {
     );
   }
 }
+///
+///una de las funcinalidades puede ser que, cuando fallen en algo,ya sea el listening o el speaking, este tenga que resolver un juego, por ejemplo; fallo escribiendo , entonces el sistema me detecta para que active el juego, este juego puede ser un juego, juego, basado en flutter games, es una idea, que despues de ganar algo tan simple como una triki traka, la sensación de victoria es fresca y agradable, entonces se libera ls respuesta correcta.
+///
