@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         ),
-        home: const MyHomePage(),
+        home:  const MyHomePage(),
       ),
     );
   }
@@ -46,69 +46,125 @@ class MyAppState extends ChangeNotifier {
  }
 }
 
-class MyHomePage extends StatelessWidget {
+// ...
+
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {           // ← 1
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  var selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+
+    Widget page;
+
+    switch (selectedIndex) {
+      case 0:
+        page = const GeneratorPage();
+        break;
+      case 1:
+        page = const Placeholder();
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Scaffold(
+          body: Row(
+            children: [
+              SafeArea(
+                child: NavigationRail(
+                  backgroundColor: Colors.indigo.shade200,
+                  extended: constraints.maxWidth >= 500,
+                  destinations: const[
+                    NavigationRailDestination(
+                      icon: Icon(Icons.home),
+                      label: Text('Home'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.favorite),
+                      label: Text('Favorites'),
+                    ),
+                  ],
+                  selectedIndex: selectedIndex,
+                  onDestinationSelected: (value) {
+                    setState(() {
+                      selectedIndex = value;
+                    });
+
+                  },
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  child: page
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    );
+  }
+}
+
+
+class GeneratorPage extends StatelessWidget {
+  const GeneratorPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var pair = appState.current;
 
-      // ↓ Add this.
     IconData icon;
     if (appState.favorites.contains(pair)) {
       icon = Icons.favorite;
     } else {
       icon = Icons.favorite_border;
     }
-      // ← 2
-    return Scaffold(                             // ← 3
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,                         // ← 4
-          children: [
-           //const Text('A random AWESOME idea:'),        // ← 5
-            BigCard(pair: pair),
-            const SizedBox(height: 15,),// ← 6
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                //ElevatedButton(
-                //  onPressed: () {
-                //    print('button pressed!');
-                //  },
-                //  child: const Row(
-                //    children: [
-                //       Icon(Icons.heart_broken_sharp),
-                //       SizedBox(width: 10,),
-                //       Text('Like'),
-                //    ],
-                //  ),
-                //),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    appState.toggleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: Text('Like'),
-                ),
-                const SizedBox(width: 15,),
-                ElevatedButton(
-                  onPressed: () {
-                  appState.getNext();  // ← This instead of print().
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: pair),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: const Text('Like'),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
                 },
                 child: const Text('Next'),
-                ),
-              ],
-            ),
-
-          ],                                      // ← 7
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
+// ...
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
